@@ -174,14 +174,11 @@ function generatePoints(layer, diff) {
 }
 
 function doReset(layer, force = false) {
-	sendDataToServer({
-		type: SERVERINFO.PLAYERDOSOMETHING,
-		what: {
-			name: "doReset",
-			layer: layer,
-			id: force
-		}
-	})
+	socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+		name: "doReset",
+		layer: layer,
+		id: null
+	})	
 
 	if (tmp[layer].type == "none") return
 	let row = tmp[layer].row
@@ -255,13 +252,10 @@ function resetRow(row) {
 }
 
 function startChallenge(layer, x) {
-	sendDataToServer({
-		type: SERVERINFO.PLAYERDOSOMETHING,
-		what: {
-			name: "StartChallenge",
-			layer: layer,
-			id: x
-		}
+	socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+		name: "StartChallenge",
+		layer: layer,
+		id: x
 	})
 
 	let enter = false
@@ -305,13 +299,10 @@ function canCompleteChallenge(layer, x) {
 }
 
 function completeChallenge(layer, x) {
-	sendDataToServer({
-		type: SERVERINFO.PLAYERDOSOMETHING,
-		what: {
-			name: "completeChallenge",
-			layer: layer,
-			id: x
-		}
+	socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+		name: "completeChallenge",
+		layer: layer,
+		id: x
 	})
 
 	var x = player[layer].activeChallenge
@@ -420,8 +411,6 @@ function hardReset(resetOptions) {
 
 var ticking = false
 
-var loading = false
-
 var lateAddLayer = function (layerName, layerData) {
 	layersNeededToLoad.push([layerName, layerData])
 }
@@ -444,7 +433,7 @@ var layersNeededToLoad = []
 
 var interval = setInterval(function () {
 	if (player === undefined || tmp === undefined) return;
-	if (ticking || loading) return;
+	if (ticking) return;
 	if (tmp.gameEnded && !player.keepGoing) return;
 	ticking = true
 
@@ -459,7 +448,7 @@ var interval = setInterval(function () {
 	}
 
 	let now = Date.now()
-	let diff = (now - player.time) / 1e3
+	let diff = ((now - player.time) / 1e3) * 10
 	let trueDiff = diff
 	if (player.offTime !== undefined) {
 		if (player.offTime.remain > modInfo.offlineLimit * 3600) player.offTime.remain = modInfo.offlineLimit * 3600
@@ -482,7 +471,7 @@ var interval = setInterval(function () {
 	updateWidth()
 	updateTabFormats()
 	gameLoop(diff)
-	//fixNaNs()
+	fixNaNs()
 	adjustPopupTime(trueDiff)
 	updateParticles(trueDiff)
 	ticking = false

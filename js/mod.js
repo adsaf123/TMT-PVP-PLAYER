@@ -1,9 +1,9 @@
 let modInfo = {
 	name: "The PVP Tree",
-	id: "mymod",
+	id: "adsaf-pvp",
 	author: "adsaf",
 	pointsName: "points",
-	modFiles: ["main.js", "tree.js", "mainLayers.js"],
+	modFiles: ["tree.js", "mainLayers.js"],
 
 	discordName: "",
 	discordLink: "",

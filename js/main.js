@@ -1,3 +1,4 @@
+
 const SERVERINFO = {
     SERVERIP: "https://TMTPVPServer.adsaf123.repl.co",
     PLAYERSETNICK: "playerSetNick",
@@ -5,64 +6,53 @@ const SERVERINFO = {
     PLAYERHOSTGAME: "playerHostGame",
     HOSTKICKPLAYER: "hostKickPlayer",
     HOSTSTARTGAME: "hostStartGame",
-    PLAYERDOSOMETHING: "playerDoSomething"
+    PLAYERDOSOMETHING: "playerDoSomething",
+    PLAYERGETGAMESLIST: "playerGetGamesList",
+    SERVERSENDGAMESLIST: "serverSendGamesList",
+    SERVERSENDGAMEINFO: "serverSendGameInfo",
+    PLAYERGETGAMEINFO: "playerGetGameInfo"
 }
+
+const socket = io(SERVERINFO.SERVERIP)
 
 var gamesList = {}
 var currentGame = -1
 var currentGameData = {}
 
 var startGame = function () {
-    sendDataToServer({type: SERVERINFO.HOSTSTARTGAME})
+    socket.emit(SERVERINFO.HOSTSTARTGAME)
 }
 
 var getGameData = function () {
-    fetch(`${SERVERINFO.SERVERIP}/gameInfo`).then(function (response) {
-        response.json().then(function (data) {
-            currentGameData = data
-        })
-    })
+    socket.emit(SERVERINFO.PLAYERGETGAMEINFO)
 } 
 
+socket.on(SERVERINFO.SERVERSENDGAMEINFO, (data) => {
+    currentGameData = data
+    if (!(tmp?.c?.gainExp instanceof Decimal) || tmp?.c?.gainExp == undefined) return 
+    fix(currentGameData?.gameState?.playersStates[currentGameData.playerID], player)
+    fix(currentGameData?.gameState?.playersTmps[currentGameData.playerID], tmp)
+    fix(currentGameData?.gameState?.layers, layers)
+    fix(currentGameData?.gameState?.funcs, funcs)
+})
+
 var hostGame = function () {
-    fetch(SERVERINFO.SERVERIP, {
-        method: "POST",
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            type: SERVERINFO.PLAYERHOSTGAME,
-            tree: player["host-game"].selectedTree,
-            maxPlayers: player["host-game"].maxPlayers
-        })
+    socket.emit(SERVERINFO.PLAYERHOSTGAME, {
+        tree: player["host-game"].selectedTree,
+        maxPlayers: player["host-game"].maxPlayers
     })
 }
 
 var getGamesFromServer = function () {
-    fetch(`${SERVERINFO.SERVERIP}/games`).then(function (response) {
-        response.json().then(function (data) {
-            gamesList = data
-        })
-    })
+    socket.emit(SERVERINFO.PLAYERGETGAMESLIST)
 }
 
-var sendDataToServer = function (data) {
-    fetch(SERVERINFO.SERVERIP, {
-        method: "POST",
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-    })
-}
+socket.on(SERVERINFO.SERVERSENDGAMESLIST, (data) => {
+    gamesList = data
+})
 
 var sendNickToServer = function () {
-    sendDataToServer({
-        type: SERVERINFO.PLAYERSETNICK,
-        nick: player["main-menu"].nick
-    })
+    socket.emit(SERVERINFO.PLAYERSETNICK, player["main-menu"].nick)
 }
 
 var generateGamesList = function () {
@@ -120,16 +110,17 @@ var generateKickClickables = function () {
 }
 
 var joinGame = function (gameID) {
-    sendDataToServer({
-        type: SERVERINFO.PLAYERJOINGAME,
-        gameID: gameID
-    })
+    socket.emit(SERVERINFO.PLAYERJOINGAME, gameID)
 }
 
 var loadGame = function () {
     for (const layer in maps[currentGameData.gameState.tree].layers) {
         lateAddLayer(layer, maps[currentGameData.gameState.tree].layers[layer])
     }
+    canGenPoints = maps[currentGameData.gameState.tree].canGenPoints
+    isEndgame = maps[currentGameData.gameState.tree].isEndgame
+    getStartPoints = maps[currentGameData.gameState.tree].getStartPoints
+    getPointGen = maps[currentGameData.gameState.tree].getPointGen
     showNavTab("tree-tab")
 } 
 

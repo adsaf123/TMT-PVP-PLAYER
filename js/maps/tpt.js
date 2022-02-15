@@ -10020,5 +10020,5 @@ var tpt = {
         if (hasUpgrade("hn", 31)) gain = gain.pow(1.05);
         return gain
     },
-    isEndgame() { return new Decimal("e3.14e16") },
+    isEndgame() { return new Decimal("e3.14e16").lte(player.points) },
 }

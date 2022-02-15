@@ -1,14 +1,12 @@
 // ************ Big Feature related ************
 
 function respecBuyables(layer) {
-	sendDataToServer({
-		type: SERVERINFO.PLAYERDOSOMETHING,
-		what: {
-			name: "respecBuyables",
-			layer: layer,
-			id: undefined
-		}
+	socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+		name: "respectBuyables",
+		layer: layer,
+		id: null
 	})
+
 
 	if (!layers[layer].buyables) return
 	if (!layers[layer].buyables.respec) return
@@ -60,14 +58,12 @@ function buyUpgrade(layer, id) {
 }
 
 function buyUpg(layer, id) {
-	sendDataToServer({
-		type: SERVERINFO.PLAYERDOSOMETHING,
-		what: {
-			name: "buyUpg",
-			layer: layer,
-			id: id
-		}
+	socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+		name: "buyUpg",
+		layer: layer,
+		id: id
 	})
+
 
 	if (!tmp[layer].upgrades || !tmp[layer].upgrades[id]) return
 	let upg = tmp[layer].upgrades[id]
@@ -109,14 +105,12 @@ function buyUpg(layer, id) {
 }
 
 function buyMaxBuyable(layer, id) {
-	sendDataToServer({
-		type: SERVERINFO.PLAYERDOSOMETHING,
-		what: {
-			name: "buyMaxBuyable",
-			layer: layer,
-			id: id
-		}
+	socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+		name: "buyMaxBuyable",
+		layer: layer,
+		id: id
 	})
+
 
 	if (!player[layer].unlocked) return
 	if (!tmp[layer].buyables[id].unlocked) return
@@ -129,13 +123,10 @@ function buyMaxBuyable(layer, id) {
 
 function buyBuyable(layer, id) {
 	if (player.navTab == "tree-tab")
-		sendDataToServer({
-			type: SERVERINFO.PLAYERDOSOMETHING,
-			what: {
-				name: "buyBuyable",
-				layer: layer,
-				id: id
-			}
+		socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+			name: "buyBuyable",
+			layer: layer,
+			id: id
 		})
 
 	if (!player[layer].unlocked) return
@@ -148,13 +139,10 @@ function buyBuyable(layer, id) {
 
 function clickClickable(layer, id) {
 	if (player.navTab == "tree-tab")
-		sendDataToServer({
-			type: SERVERINFO.PLAYERDOSOMETHING,
-			what: {
-				name: "clickClickable",
-				layer: layer,
-				id: id
-			}
+		socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+			name: "clickClickable",
+			layer: layer,
+			id: id
 		})
 
 	if (!player[layer].unlocked || tmp[layer].deactivated) return
@@ -166,13 +154,10 @@ function clickClickable(layer, id) {
 }
 
 function clickGrid(layer, id) {
-	sendDataToServer({
-		type: SERVERINFO.PLAYERDOSOMETHING,
-		what: {
-			name: "clickGrid",
-			layer: layer,
-			id: id
-		}
+	socket.emit(SERVERINFO.PLAYERDOSOMETHING, {
+		name: "clickGrid",
+		layer: layer,
+		id: id
 	})
 
 	if (!player[layer].unlocked || tmp[layer].deactivated) return

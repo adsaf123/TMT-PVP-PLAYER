@@ -1,3 +1,5 @@
+var ticksAfterDonwloadingData = 0
+
 addLayer("main-menu", {
     startData() {
         return {
@@ -149,18 +151,22 @@ addLayer("game-lobby", {
     },
 
     update(diff) {
-        if (player.navTab == "game-lobby" || player.navTab == "tree-tab")
+        if (player.navTab == "game-lobby") {
             getGameData()
+        }
+
+        ticksAfterDonwloadingData++
+        if (player.navTab == "tree-tab" && ticksAfterDonwloadingData >= 20 * 5) {
+            getGameData()
+            ticksAfterDonwloadingData = 0
+        }
+
         if (currentGameData.playerID && player.navTab == "game-lobby")
             loadGame()
 
         //console.log(layers?.b?.milestones)
         if (currentGameData.playerID && layersNeededToLoad.length == 0) {
             if (player.navTab != "tree-tab") showNavTab("tree-tab")
-            fix(currentGameData?.gameState?.playersStates[currentGameData.playerID], player)
-            fix(currentGameData?.gameState?.playersTmps[currentGameData.playerID], tmp)
-            fix(currentGameData?.gameState?.layers, layers)
-            fix(currentGameData?.gameState?.funcs, funcs)
         }
     }
 })
