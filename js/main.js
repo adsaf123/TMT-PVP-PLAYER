@@ -25,11 +25,11 @@ var startGame = function () {
 
 var getGameData = function () {
     socket.emit(SERVERINFO.PLAYERGETGAMEINFO)
-} 
+}
 
 socket.on(SERVERINFO.SERVERSENDGAMEINFO, (data) => {
     currentGameData = data
-    if (!(tmp?.c?.gainExp instanceof Decimal) || tmp?.c?.gainExp == undefined) return 
+    if (!(tmp?.c?.gainExp instanceof Decimal) || tmp?.c?.gainExp == undefined) return
     fix(currentGameData?.gameState?.playersStates[currentGameData.playerID], player)
     fix(currentGameData?.gameState?.playersTmps[currentGameData.playerID], tmp)
     fix(currentGameData?.gameState?.layers, layers)
@@ -60,7 +60,9 @@ var generateGamesList = function () {
     for (const [k, v] of Object.entries(gamesList)) {
         list[1].push(["row", []])
         list[1][list[1].length - 1][1].push(["display-text", v.hostNick])
+        list[1][list[1].length - 1][1].push("blank")
         list[1][list[1].length - 1][1].push(["display-text", v.tree])
+        list[1][list[1].length - 1][1].push("blank")
         list[1][list[1].length - 1][1].push(["display-text", `${v.players.length}/${v.maxPlayers}`])
         list[1][list[1].length - 1][1].push(["clickable", `jg${k}`])
     }
@@ -73,10 +75,10 @@ var generateGamesClickables = function () {
         clickables[`jg${k}`] = {}
         clickables[`jg${k}`].id = `jg${k}`
         clickables[`jg${k}`].layer = "games-list"
-        clickables[`jg${k}`].unlocked = function() { return true }
+        clickables[`jg${k}`].unlocked = function () { return true }
         clickables[`jg${k}`].display = function () { return "join" }
         clickables[`jg${k}`].canClick = function () { return true }
-        clickables[`jg${k}`].onClick = function () { joinGame(k); showNavTab("game-lobby") }
+        clickables[`jg${k}`].onClick = function () { if (v.maxPlayers !== v.players.lenght) { joinGame(k); showNavTab("game-lobby") } }
         clickables[`jg${k}`].style = { "width": "30px", "height": "30px", "min-height": "30px" }
 
     }
@@ -92,9 +94,9 @@ var generateKickClickables = function () {
         clickables[`kp${k.ip}`].id = `kp${i}`
         clickables[`kp${k.ip}`].layer = "game-lobby"
         clickables[`kp${k.ip}`].style = { "width": "30px", "height": "30px", "min-height": "30px" }
-        clickables[`kp${k.ip}`].unlocked = function() { return true }
+        clickables[`kp${k.ip}`].unlocked = function () { return true }
         clickables[`kp${k.ip}`].display = function () { return "kick" }
-        clickables[`kp${k.ip}`].canClick = function () { return true }
+        clickables[`kp${k.ip}`].canClick = function () { return k.ip != currentGameData.host }
         clickables[`kp${k.ip}`].onClick = function () { sendDataToServer({ type: SERVERINFO.HOSTKICKPLAYER, playerID: k.ip }) }
         i++
     }
@@ -122,7 +124,7 @@ var loadGame = function () {
     getStartPoints = maps[currentGameData.gameState.tree].getStartPoints
     getPointGen = maps[currentGameData.gameState.tree].getPointGen
     showNavTab("tree-tab")
-} 
+}
 
 var fix = function (newData, oldData) {
     for (item in newData) {

@@ -130,7 +130,7 @@ addLayer("game-lobby", {
                 list[1][list[1].length - 1][1].push("blank")
                 list[1][list[1].length - 1][1].push(["display-text", player.ip == currentGameData.host ? "HOST" : ""])
                 list[1][list[1].length - 1][1].push("blank")
-                list[1][list[1].length - 1][1].push(["clickable", `kp${i}`])
+                list[1][list[1].length - 1][1].push(["clickable", `kp${player.ip}`])
                 i++
             }
         
@@ -156,7 +156,7 @@ addLayer("game-lobby", {
         }
 
         ticksAfterDonwloadingData++
-        if (player.navTab == "tree-tab" && ticksAfterDonwloadingData >= 20 * 5) {
+        if (player.navTab == "tree-tab" && ticksAfterDonwloadingData >= 20) {
             getGameData()
             ticksAfterDonwloadingData = 0
         }

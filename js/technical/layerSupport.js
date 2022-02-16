@@ -116,6 +116,12 @@ function setupLayer(layer){
     }
     if (layers[layer].buyables){
         layers[layer].buyables.layer = layer
+        if (isFunction(layers[layer].buyables)) {
+            let buyablesData = layers[layer].buyables()
+            for (item in buyablesData) {
+                layers[layer].buyables[item] = buyablesData[item]
+            }
+        }
         setRowCol(layers[layer].buyables)
         for (thing in layers[layer].buyables){
             if (isPlainObject(layers[layer].buyables[thing])){
@@ -133,6 +139,12 @@ function setupLayer(layer){
 
     if (layers[layer].clickables){
         layers[layer].clickables.layer = layer
+        if (isFunction(layers[layer].clickables)) {
+            let clickablesData = layers[layer].clickables()
+            for (item in clickablesData) {
+                layers[layer].clickables[item] = clickablesData[item]
+            }
+        }
         setRowCol(layers[layer].clickables)
         for (thing in layers[layer].clickables){
             if (isPlainObject(layers[layer].clickables[thing])){

@@ -52,6 +52,15 @@ function addedPlayerData() { return {
 
 // Display extra things at the top of the page
 var displayThings = [
+	function () {
+		let ret = ""
+		if (!currentGameData?.playerID) return ret
+		for (item in currentGameData.gameState.playersStates) {
+			if (item == currentGameData.playerID) continue
+			ret += `${currentGameData.gameState.players.filter(v => item == v.ip)[0].nick} has ${format(currentGameData.gameState.playersStates[item].points)} points<br>`
+		}
+		return ret
+	}
 ]
 
 // Determines when the game "ends"

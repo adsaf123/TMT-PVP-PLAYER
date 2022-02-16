@@ -147,6 +147,18 @@ function updateTempData(layerData, tmpData, funcsData, useThis) {
 			if (useThis !== undefined) value = layerData[item].bind(useThis)()
 			else value = layerData[item]()
 			Vue.set(tmpData, item, value)
+
+			if (["clickables", "buyables"].includes(item)) {
+				for (i in value) {
+					Vue.set(layerData[item], i, value[i])
+					if (isPlainObject(layerData[item][i])){
+						Vue.set(layerData[item][i], "id", i)
+						Vue.set(layerData[item][i], "layer", layerData.layer)
+						if (layerData[item][i].unlocked === undefined)
+							VUe.set(layerData[item][i], "unlocked", true)
+					}
+				}
+			}
 		}
 	}
 }
