@@ -156,7 +156,7 @@ addLayer("game-lobby", {
         }
 
         ticksAfterDonwloadingData++
-        if (player.navTab == "tree-tab" && ticksAfterDonwloadingData >= 20) {
+        if (player.navTab == "tree-tab" && ticksAfterDonwloadingData >= 100) {
             getGameData()
             ticksAfterDonwloadingData = 0
         }
