@@ -1,6 +1,6 @@
 
 const SERVERINFO = {
-    SERVERIP: "https://TMTPVPServer.adsaf123.repl.co",
+    SERVERIP: "https://TMTPVPserver.adsaf123.repl.co",
     PLAYERSETNICK: "playerSetNick",
     PLAYERJOINGAME: "playerJoinGame",
     PLAYERHOSTGAME: "playerHostGame",
@@ -30,10 +30,8 @@ var getGameData = function () {
 socket.on(SERVERINFO.SERVERSENDGAMEINFO, (data) => {
     currentGameData = data
     if (!(tmp?.c?.gainExp instanceof Decimal) || tmp?.c?.gainExp == undefined) return
-    fix(currentGameData?.gameState?.playersStates[currentGameData.playerID], player)
-    fix(currentGameData?.gameState?.playersTmps[currentGameData.playerID], tmp)
-    fix(currentGameData?.gameState?.layers, layers)
-    fix(currentGameData?.gameState?.funcs, funcs)
+    fix(currentGameData?.gameState?.playersStates[currentGameData.playerID].player, player)
+    fix(currentGameData?.gameState?.playersStates[currentGameData.playerID].tmp, tmp)
 })
 
 var hostGame = function () {

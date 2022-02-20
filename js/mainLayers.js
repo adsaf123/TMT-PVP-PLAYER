@@ -164,7 +164,6 @@ addLayer("game-lobby", {
         if (currentGameData.playerID && player.navTab == "game-lobby")
             loadGame()
 
-        //console.log(layers?.b?.milestones)
         if (currentGameData.playerID && layersNeededToLoad.length == 0) {
             if (player.navTab != "tree-tab") showNavTab("tree-tab")
         }
