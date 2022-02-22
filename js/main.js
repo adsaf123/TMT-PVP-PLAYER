@@ -1,6 +1,6 @@
 
 const SERVERINFO = {
-    SERVERIP: "https://TMTPVPserver.adsaf123.repl.co",
+    SERVERIP: "ws://localhost:5000",
     PLAYERSETNICK: "playerSetNick",
     PLAYERJOINGAME: "playerJoinGame",
     PLAYERHOSTGAME: "playerHostGame",
@@ -10,14 +10,43 @@ const SERVERINFO = {
     PLAYERGETGAMESLIST: "playerGetGamesList",
     SERVERSENDGAMESLIST: "serverSendGamesList",
     SERVERSENDGAMEINFO: "serverSendGameInfo",
-    PLAYERGETGAMEINFO: "playerGetGameInfo"
+    PLAYERGETGAMEINFO: "playerGetGameInfo",
+    PLAYERGETCHAT: "playerGetChat",
+    SERVERSENDCHAT: "serverSendChat",
+    PLAYERSENDMESSAGE: "playerSendMessage",
+    //PLAYERHALFRESOURCE: "playerHalfResource"
 }
 
 const socket = io(SERVERINFO.SERVERIP)
 
+var currentChat = "global"
 var gamesList = {}
 var currentGame = -1
 var currentGameData = {}
+var chatMessages = []
+
+var sendMessage = function () {
+    socket.emit(SERVERINFO.PLAYERSENDMESSAGE, document.getElementById("message").value, currentChat)
+}
+
+var getMessages = function () {
+    socket.emit(SERVERINFO.PLAYERGETCHAT, currentChat)
+}
+
+socket.on(SERVERINFO.SERVERSENDCHAT, (data) => {
+    if (chatMessages.length == data.length) return
+    chatMessages = data
+    let el = document.getElementById("chatBox")
+    let onBottom = el.scrollTop == (el.scrollHeight - 150)
+    el.innerHTML = ""
+    for (let item in chatMessages) {
+        var message = document.createElement("p")
+        message.setAttribute("style", "text-align: left")
+        message.innerText = `[${chatMessages[item].player}]: ${chatMessages[item].message}`
+        el.appendChild(message)
+    }
+    if (onBottom) el.scrollTop = el.scrollHeight
+})
 
 var startGame = function () {
     socket.emit(SERVERINFO.HOSTSTARTGAME)
@@ -29,9 +58,8 @@ var getGameData = function () {
 
 socket.on(SERVERINFO.SERVERSENDGAMEINFO, (data) => {
     currentGameData = data
-    if (!(tmp?.c?.gainExp instanceof Decimal) || tmp?.c?.gainExp == undefined) return
-    fix(currentGameData?.gameState?.playersStates[currentGameData.playerID].player, player)
-    fix(currentGameData?.gameState?.playersStates[currentGameData.playerID].tmp, tmp)
+    if (player?.p == undefined) return 
+    fix(currentGameData?.gameState?.playersStates[currentGameData.playerID], player)
 })
 
 var hostGame = function () {
@@ -76,9 +104,34 @@ var generateGamesClickables = function () {
         clickables[`jg${k}`].unlocked = function () { return true }
         clickables[`jg${k}`].display = function () { return "join" }
         clickables[`jg${k}`].canClick = function () { return true }
-        clickables[`jg${k}`].onClick = function () { if (v.maxPlayers !== v.players.lenght) { joinGame(k); showNavTab("game-lobby") } }
+        clickables[`jg${k}`].onClick = function () { if (v.maxPlayers !== v.players.length) { joinGame(k); showNavTab("game-lobby") } }
         clickables[`jg${k}`].style = { "width": "30px", "height": "30px", "min-height": "30px" }
 
+    }
+    return clickables
+}
+
+var generatePlayerSelectClickables = function () {
+    var clickables = {}
+    for (const item in currentGameData.gameState.playersStates) {
+        clickables[`s${item}`] = {}
+        clickables[`s${item}`].id = `s${item}`
+        clickables[`s${item}`].layer = "spells"
+        clickables[`s${item}`].style = { "width": "30px", "height": "30px", "min-height": "30px" }
+        clickables[`s${item}`].unlocked = function () { return true }
+        clickables[`s${item}`].display = function () { return "select" }
+        clickables[`s${item}`].canClick = function () { return player.spells.selectedPlayer != item && player.spells.s1time == 0 }
+        clickables[`s${item}`].onClick = function () { player.spells.selectedPlayer = item }
+    }
+    for (const item of ["p", "g", "b", "s", "t", "e"]) {
+        clickables[`sl${item}`] = {}
+        clickables[`sl${item}`].id = `sl${item}`
+        clickables[`sl${item}`].layer = "spells"
+        clickables[`sl${item}`].style = { "width": "30px", "height": "30px", "min-height": "30px", "background-color": tmp[item]?.color}
+        clickables[`sl${item}`].unlocked = function () { return true }
+        clickables[`sl${item}`].display = function () { return `select ${item}` }
+        clickables[`sl${item}`].canClick = function () { return player.spells.selectedLayer != item }
+        clickables[`sl${item}`].onClick = function () { player.spells.selectedLayer = item }
     }
     return clickables
 }
@@ -89,7 +142,7 @@ var generateKickClickables = function () {
     let i = 0
     for (const k of currentGameData.players) {
         clickables[`kp${k.ip}`] = {}
-        clickables[`kp${k.ip}`].id = `kp${i}`
+        clickables[`kp${k.ip}`].id = `kp${k.ip}`
         clickables[`kp${k.ip}`].layer = "game-lobby"
         clickables[`kp${k.ip}`].style = { "width": "30px", "height": "30px", "min-height": "30px" }
         clickables[`kp${k.ip}`].unlocked = function () { return true }
@@ -134,4 +187,12 @@ var fix = function (newData, oldData) {
             oldData[item] = newData[item]
         }
     }
+}
+
+var changeChat = function(toWhich) {
+    currentChat = toWhich
+}
+
+var halfPlayerResource = function () {
+    //socket.emit(SERVERINFO.PLAYERHALFRESOURCE, player.spells.selectedPlayer, player.spells.selectedLayer)
 }

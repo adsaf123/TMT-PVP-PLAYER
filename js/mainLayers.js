@@ -167,5 +167,7 @@ addLayer("game-lobby", {
         if (currentGameData.playerID && layersNeededToLoad.length == 0) {
             if (player.navTab != "tree-tab") showNavTab("tree-tab")
         }
+
+        getMessages()
     }
 })

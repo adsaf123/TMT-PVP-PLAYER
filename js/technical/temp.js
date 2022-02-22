@@ -155,7 +155,7 @@ function updateTempData(layerData, tmpData, funcsData, useThis) {
 						Vue.set(layerData[item][i], "id", i)
 						Vue.set(layerData[item][i], "layer", layerData.layer)
 						if (layerData[item][i].unlocked === undefined)
-							VUe.set(layerData[item][i], "unlocked", true)
+							Vue.set(layerData[item][i], "unlocked", true)
 					}
 				}
 			}

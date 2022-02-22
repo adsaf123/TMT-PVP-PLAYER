@@ -57,7 +57,7 @@ var displayThings = [
 		if (!currentGameData?.playerID) return ret
 		for (item in currentGameData.gameState.playersStates) {
 			if (item == currentGameData.playerID) continue
-			ret += `${currentGameData.gameState.players.filter(v => item == v.ip)[0].nick} has ${format(currentGameData.gameState.playersStates[item].player.points)} points<br>`
+			ret += `${currentGameData.gameState.players.filter(v => item == v.ip)[0].nick} has ${format(currentGameData.gameState.playersStates[item].points)} points<br>`
 		}
 		return ret
 	}

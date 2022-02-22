@@ -37,7 +37,7 @@ var tpt = {
                 { key: "p", description: "Press P to Prestige.", onPress() { if (canReset(this.layer)) doReset(this.layer) } },
             ],
             layerShown() { return true },
-            passiveGeneration() { return (hasMilestone("g", 1) && player.ma.current != "p") ? 1 : 0 },
+            passiveGeneration() { return (hasMilestone("g", 1)) ? 1 : 0 },
             doReset(resettingLayer) {
                 let keep = [];
                 if (hasMilestone("b", 0) && resettingLayer == "b") keep.push("upgrades")
@@ -63,7 +63,7 @@ var tpt = {
                 11: {
                     title: "Begin",
                     description: "Generate 1 Point every second.",
-                    cost() { return new Decimal(1)},
+                    cost() { return new Decimal(1) },
                 },
                 12: {
                     title: "Prestige Boost",
@@ -104,7 +104,7 @@ var tpt = {
                 22: {
                     title: "Upgrade Power",
                     description: "Point generation is faster based on your Prestige Upgrades bought.",
-                    cost() { return new Decimal(75)},
+                    cost() { return new Decimal(75) },
                     effect() {
                         let eff = Decimal.pow(1.4, player.p.upgrades.length);
                         if (hasUpgrade("p", 32)) eff = eff.pow(2);
@@ -116,7 +116,7 @@ var tpt = {
                 23: {
                     title: "Reverse Prestige Boost",
                     description: "Prestige Point gain is boosted by your Points.",
-                    cost() { return 5e3},
+                    cost() { return 5e3 },
                     effect() {
                         let eff = player.points.plus(1).log10().cbrt().plus(1);
                         if (hasUpgrade("p", 33)) eff = eff.pow(upgradeEffect("p", 33));
@@ -175,7 +175,7 @@ var tpt = {
             ],
             layerShown() { return player.p.unlocked },
             automate() { },
-            resetsNothing() { return hasMilestone("t", 4) && player.ma.current != "b" },
+            resetsNothing() { return hasMilestone("t", 4) },
             addToBase() {
                 let base = new Decimal(0);
                 if (hasUpgrade("b", 12)) base = base.plus(upgradeEffect("b", 12));
@@ -227,7 +227,7 @@ var tpt = {
                     auto: false,
                 }
             },
-            autoPrestige() { return (hasMilestone("t", 3) && player.b.auto)},
+            autoPrestige() { return (hasMilestone("t", 3) && player.b.auto) },
             increaseUnlockOrder: ["g"],
             milestones: {
                 0: {
@@ -435,7 +435,7 @@ var tpt = {
                     title: "GP Combo",
                     description: "Best Generators boost Prestige Point gain.",
                     cost() { return new Decimal(3) },
-                    effect() { return player.g.best.sqrt().plus(1)},
+                    effect() { return player.g.best.sqrt().plus(1) },
                     unlocked() { return player.g.unlocked },
                     effectDisplay() { return format(tmp.g.upgrades[11].effect) + "x" },
                 },
@@ -866,7 +866,7 @@ var tpt = {
                     total: new Decimal(0),
                     first: 0,
                     auto: false,
-                    unlockOrder: 0, 
+                    unlockOrder: 0,
                 }
             },
             color: "#b82fbd",
@@ -1347,7 +1347,7 @@ var tpt = {
                         let amount = getBuyableAmount(this.layer, this.id)
                     },
                     canSellOne() { return false },
-                    autoed() { return false},
+                    autoed() { return false },
                 },
                 12: {
                     title: "Secondary Space Building",
@@ -1691,6 +1691,95 @@ var tpt = {
                 //adjustNotificationTime(diff);
             },
         },
+
+        "spells": {
+            type: "none",
+            row: "side",
+            color: "#FF1493",
+
+            startData() {
+                return {
+                    unlocked: true,
+                    mana: 0,
+                    points: new Decimal(0),
+                    selectedPlayer: undefined,
+                    selectedLayer: undefined,
+                    s1time: 0,
+                    s3time: 0,
+                }
+            },
+
+            tabFormat: [
+                ["display-text", function () { return `You have ${format(player.spells.mana)} mana with cap of 100. It regenerates at speed of 0.1MP/sec (do note game default speedup of 10x)` }],
+                ["display-text", "List of enemy players:"],
+                function () {
+                    let ret = ["column", []]
+                    for (let item of Object.keys(currentGameData.gameState.playersStates).filter(v => v != currentGameData.playerID)) {
+                        ret[1].push(["row", [
+                            ["display-text", `${currentGameData.gameState.players.filter(v => item == v.ip)[0].nick}`],
+                            ["clickable", `s${item}`]
+                        ]])
+                    }
+                    return ret
+                },
+                function () {
+                    let ret = ["row", []]
+                    for (let item of ["p", "g", "b", "s", "t", "e"]) {
+                        ret[1].push(["clickable", `sl${item}`])
+                    }
+                    return ret
+                },
+                ["row", [
+                    ["buyable", "s1"],
+                    ["buyable", "s2"],
+                    ["buyable", "s3"],
+                ]],
+                function () {
+                    if (player.spells.s1time > 0) return ["display-text", `Player have:<br>
+                    ${format(currentGameData.gameState.playersStates[player.spells.selectedPlayer].p.points)} p<br>
+                    ${format(currentGameData.gameState.playersStates[player.spells.selectedPlayer].b.points)} b<br>
+                    ${format(currentGameData.gameState.playersStates[player.spells.selectedPlayer].g.points)} g<br>
+                    ${format(currentGameData.gameState.playersStates[player.spells.selectedPlayer].t.points)} t<br>
+                    ${format(currentGameData.gameState.playersStates[player.spells.selectedPlayer].e.points)} e<br>
+                    ${format(currentGameData.gameState.playersStates[player.spells.selectedPlayer].s.points)} s`]
+                }
+            ],
+
+            update(diff) {
+                player.spells.mana += diff * 0.1
+                player.spells.mana = Math.min(player.spells.mana, 100) 
+                
+                player.spells.s1time = Math.max(0, player.spells.s1time - diff)
+                player.spells.s3time = Math.max(0, player.spells.s3time - diff)
+            },
+            clickables: generatePlayerSelectClickables,
+            buyables: {
+                "s1": {
+                    display: "Spend 25 mana to see other player ALL resources for 5 secs (locks selecting players)",
+                    canAfford() { return player.spells.mana >= 25 && player.spells.selectedPlayer},
+                    buy() {
+                        player.spells.mana -= 25
+                        player.spells.s1time = 50
+                    }
+                },
+                "s2": {
+                    display: "Spend 90 mana to half one selected resource of another player (rounds up)",
+                    canAfford() { return player.spells.mana >= 90 },
+                    buy() {
+                        player.spells.mana -= 90
+                        halfPlayerResource(player.spells.selectedPlayer, player.spells.selectedLayer)
+                    }
+                },
+                "s3": {
+                    display: "Spend 50 mana to boost point gain x3 for 10 secs",
+                    canAfford() { return player.spells.mana >= 50 },
+                    buy() {
+                        player.spells.mana -= 50
+                        player.spells.s3time = 100
+                    }
+                }
+            }
+        }
     },
     getStartPoints() { return new Decimal(10) },
     canGenPoints() { return hasUpgrade("p", 11) },
@@ -1708,6 +1797,8 @@ var tpt = {
         if (player.g.unlocked) gain = gain.times(tmp.g.powerEff);
         if (player.t.unlocked) gain = gain.times(tmp.t.enEff);
         if (player.s.unlocked) gain = gain.times(buyableEffect("s", 11));
+
+        if (player.spells.s3time > 0) gain = gain.times(3)
 
         return gain
     },

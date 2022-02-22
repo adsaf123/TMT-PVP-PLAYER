@@ -69,7 +69,6 @@ var indexCopy = `
 			<bg :layer="player.navTab == 'none' ? player.tab : player.navTab" ></bg>
 		</div>
 
-		<!-- Popups -->
 		<div class="popup-container">
 			<transition-group name="fade">
 				<div v-for="popup,index in activePopups" class="popup" v-bind:class="popup.type"
@@ -95,6 +94,16 @@ var indexCopy = `
 
 		</div>
 		<div class = "bg2" v-bind:style = "tmp.backgroundStyle"></div>
+
+		<div style="left: 0%; bottom: 0%; position: absolute; z-index: 1;">
+			<div id="chatBox" style="height: 150px; width: min(50vw, 300px); overflow-y: auto"></div>
+			<div>
+				<button onclick="changeChat('lobby')">Lobby</button>
+				<button onclick="changeChat('global')">Global</button>
+				<input id="message" type="text">
+				<button onclick="sendMessage()">Send</button>
+			</div>
+		</div>
 
 	</div>
 </body>
